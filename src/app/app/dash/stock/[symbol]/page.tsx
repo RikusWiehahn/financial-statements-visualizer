@@ -45,6 +45,14 @@ export default function StockPage(props: { params: { symbol: string } }) {
             value={`${(stock?.priceToBook || 0).toFixed(2)}`}
           />
           <Indicator
+            label="Price to Sales Ratio"
+            value={`${(stock?.priceToSales || 0).toFixed(2)}`}
+          />
+          <Indicator
+            label="Price to Earnings Ratio"
+            value={`${(stock?.priceToEarnings || 0).toFixed(2)}`}
+          />
+          <Indicator
             label="Current Ratio"
             value={`${(stock?.currentRatio || 0).toFixed(2)}`}
           />

@@ -35,7 +35,7 @@ export default function RootLayout({
       <Head>
         <meta charSet="utf-8" />
         <meta name="theme-color" content="#000000" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/images/icon.png" />
         <meta
           name="viewport"
           content="width=device-width, initial-scale=1, shrink-to-fit=no"

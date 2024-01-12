@@ -1,6 +1,8 @@
+import { StoreState } from "@/config/ReduxStore";
 import { StatementsVisualization, UiModes } from "@/config/_Interfaces";
 import { toNoUnderscoreTitleCase } from "@/config/utils";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import {
   Bar,
   BarChart,
@@ -10,31 +12,10 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { H2 } from "./Typography";
-import { useSelector } from "react-redux";
-import { StoreState } from "@/config/ReduxStore";
 import { theme } from "../../tailwind.config";
-
-// export interface StatementsVisualization {
-//   periods: string[];
-//   commonStock: number[];
-//   price: number[];
-//   current_assets: number[];
-//   non_current_assets: number[];
-//   current_liabilities: number[];
-//   non_current_liabilities: number[];
-//   revenue: number[];
-//   cost_of_revenue: number[];
-//   research_and_development: number[];
-//   selling_general_and_admin: number[];
-//   net_ops_cash: number[];
-//   net_investing_cash: number[];
-//   net_financing_cash: number[];
-//   cash_at_end: number[];
-// }
+import { H2 } from "./Typography";
 
 interface ChartData {
-  name: string;
   [key: string]: number | string;
 }
 
@@ -54,29 +35,22 @@ export const StatementsVisualizer = (props: {
     const newChart: ChartData[] = [];
 
     for (let I = props.viz.periods.length - 1; I >= 0; I--) {
-      newChart.push({
-        name: props.viz.periods[I],
-      });
-
       const cap = props.viz.commonStock[I] * props.viz.price[I];
       newChart.push({
-        name: `Market Cap`,
-        [`market_cap`]: cap / 3,
+        name: props.viz.periods[I],
+        [`market_cap_1/3`]: cap / 3,
       });
       newChart.push({
-        name: `Market Cap`,
-        [`market_cap`]: cap / 3,
+        [`market_cap_1/3`]: cap / 3,
       });
       newChart.push({
-        name: `Market Cap`,
-        [`market_cap`]: cap / 3,
+        [`market_cap_1/3`]: cap / 3,
       });
 
       const current_assets = props.viz.currentAssets[I];
       const non_current_assets = props.viz.nonCurrentAssets[I];
 
       newChart.push({
-        name: `Assets`,
         [`current_assets`]: current_assets,
         [`non_current_assets`]: non_current_assets,
       });
@@ -85,7 +59,6 @@ export const StatementsVisualizer = (props: {
       const non_current_liabilities = props.viz.nonCurrentLiabilities[I];
 
       newChart.push({
-        name: `Liabilities`,
         [`current_liabilities`]: current_liabilities,
         [`non_current_liabilities`]: non_current_liabilities,
       });
@@ -96,19 +69,16 @@ export const StatementsVisualizer = (props: {
       const selling_general_and_admin = props.viz.sellingGeneralAndAdmin[I];
 
       newChart.push({
-        name: `Sales`,
         [`revenue`]: revenue,
       });
 
       newChart.push({
-        name: `Expenses`,
         [`cost_of_revenue`]: cost_of_revenue,
         [`research_and_development`]: research_and_development,
         [`selling_general_and_admin`]: selling_general_and_admin,
       });
 
       newChart.push({
-        name: `Net Income`,
         [`net_income`]: props.viz.netIncome[I],
       });
 
@@ -118,20 +88,17 @@ export const StatementsVisualizer = (props: {
       const cash_at_end = props.viz.cashAtEnd[I];
 
       newChart.push({
-        name: `Cash`,
         [`cash_at_start`]:
           cash_at_end - net_ops_cash - net_investing_cash - net_financing_cash,
       });
 
       newChart.push({
-        name: `Cash`,
         [`net_ops_cash`]: net_ops_cash,
         [`net_investing_cash`]: net_investing_cash,
         [`net_financing_cash`]: net_financing_cash,
       });
 
       newChart.push({
-        name: `Cash`,
         [`cash_at_end`]: cash_at_end,
       });
     }
@@ -154,18 +121,22 @@ export const StatementsVisualizer = (props: {
               `${Intl.NumberFormat("en").format(Math.round(Number(num)))}`
             }
             wrapperStyle={{ zIndex: 1, backgroundColor: "transparent" }}
+
             contentStyle={{
-              borderWidth: 0,
-              backgroundColor: isDark ? theme.colors.gray[800] : "white",
+              borderWidth: 1,
+              backgroundColor: isDark ? theme.colors.gray[900] : "white",
               boxShadow:
                 "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
             }}
           />
-          <CartesianGrid strokeDasharray="5 5" />
+          <CartesianGrid
+            strokeDasharray="5 5"
+            stroke={isDark ? theme.colors.gray[700] : theme.colors.gray[300]}
+          />
           <Bar
             type="monotone"
             stackId="1"
-            dataKey="market_cap"
+            dataKey="market_cap_1/3"
             stroke="rgba(0,0,0,0)"
             fillOpacity={1}
             fill="#7e22ce"
@@ -288,11 +259,19 @@ export const StatementsVisualizer = (props: {
             textAnchor="start"
             height={120}
             fontSize={12}
+            tick={{
+              fill: isDark ? theme.colors.gray[300] : theme.colors.gray[700],
+            }}
           />
           <YAxis
             tickFormatter={(num) => `$${Intl.NumberFormat("en").format(num)}`}
             width={100}
             fontSize={12}
+            // color
+            // tick
+            tick={{
+              fill: isDark ? theme.colors.gray[300] : theme.colors.gray[700],
+            }}
           />
         </BarChart>
       </ResponsiveContainer>

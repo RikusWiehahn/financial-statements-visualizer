@@ -25,8 +25,7 @@ export const MainMenu = () => {
         </div>
       </Link>
       <div className="px-3 text-sm">
-
-      <DarkModeUtility />
+        <DarkModeUtility />
       </div>
     </div>
   );

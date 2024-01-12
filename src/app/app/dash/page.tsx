@@ -1,6 +1,7 @@
 "use client";
 
 import { TextInput } from "@/components/TextInput";
+import { Body, H3 } from "@/components/Typography";
 import { StoreState } from "@/config/ReduxStore";
 import { StockQuote } from "@/config/_Interfaces";
 import { routes } from "@/config/_routes";
@@ -29,17 +30,17 @@ export default function Home() {
       return (
         <div
           key={q.symbol}
-          className="p-4 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 cursor-pointer bg-white dark:bg-gray-800 mb-2"
+          className="p-4 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 cursor-pointer bg-white dark:bg-gray-800 mb-4 rounded-md"
           onClick={() => {
             router.push(`${routes.STOCK}/${q.symbol}`)
           }}
         >
-          <div className="text-lg font-semibold">{q.shortname}</div>
-          <div className="text-sm text-gray-500">{q.symbol}</div>
-          <div className="text-sm text-gray-500">{q.quoteType}</div>
-          <div className="text-sm text-gray-500">{`${q.exchange} ${q.exchDisp}`}</div>
-          <div className="text-sm text-gray-500">{q.sector}</div>
-          <div className="text-sm text-gray-500">{q.industry}</div>
+          <H3 className="text-lg font-semibold">{q.shortname}</H3>
+          <Body className="text-sm">{q.symbol}</Body>
+          <Body className="text-sm">{q.quoteType}</Body>
+          <Body className="text-sm">{`${q.exchange} ${q.exchDisp}`}</Body>
+          <Body className="text-sm">{q.sector}</Body>
+          <Body className="text-sm">{q.industry}</Body>
         </div>
       );
     });
@@ -51,7 +52,7 @@ export default function Home() {
       {loading ? <LinearProgress color="inherit" /> : null}
       <div className="p-4">
         <TextInput
-          placeholder="Search for a stock"
+          placeholder="Search for a stonk eg. Apple"
           onChangeText={(e) => setSearchTerm(e)}
           value={searchTerm}
           onPressEnter={searchApi}

@@ -1,11 +1,11 @@
 "use client";
 
+import { DarkModeWrapper } from "@/components/DarkModeWrapper";
 import { Drawer } from "@mui/material";
+import { usePathname } from "next/navigation";
 import React, { useEffect } from "react";
 import { RiCloseFill, RiMenuFill } from "react-icons/ri";
 import { MainMenu } from "./MainMenu";
-import { usePathname } from "next/navigation";
-import { DarkModeWrapper } from "@/components/DarkModeWrapper";
 
 export const SwipeMenu = () => {
   const pathname = usePathname();
@@ -56,7 +56,7 @@ export const SwipeMenu = () => {
             onClose={toggleDrawer()}
           >
             <DarkModeWrapper>
-              <div className="h-full w-72 max-w-screen bg-white dark:bg-gray-800 dark:text-white overflow-y-auto">
+              <div className="h-screen w-72 max-w-screen bg-white dark:bg-gray-800 dark:text-white overflow-y-auto">
                 <div className="flex justify-between h-16 items-center p-2">
                   <button
                     aria-label="Close button"
@@ -67,6 +67,17 @@ export const SwipeMenu = () => {
                   </button>
                 </div>
                 <MainMenu />
+                <div className="absolute bottom-0 w-full px-4 text-sm font-semibold pb-4">
+                  Made with ❤️ by{" "}
+                  <a
+                    href="https://zeltta.co.nz"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-blue-500"
+                  >
+                    Zeltta
+                  </a>
+                </div>
               </div>
             </DarkModeWrapper>
           </Drawer>

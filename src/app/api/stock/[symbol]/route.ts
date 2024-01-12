@@ -36,6 +36,8 @@ export async function GET(
       sector: fundamentals.assetProfile?.sector,
       insiderOwnership: fundamentals.defaultKeyStatistics?.heldPercentInsiders,
       priceToBook: fundamentals.defaultKeyStatistics?.priceToBook,
+      priceToSales: (fundamentals.price?.marketCap||0) / (fundamentals.financialData?.totalRevenue ||0),
+      priceToEarnings: (fundamentals.price?.regularMarketPrice||0) / (fundamentals.defaultKeyStatistics?.trailingEps ||0),
       currentRatio: fundamentals.financialData?.currentRatio,
       quickRatio: fundamentals.financialData?.quickRatio,
       debtToEquity: fundamentals.financialData?.debtToEquity,

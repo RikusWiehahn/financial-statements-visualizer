@@ -43,6 +43,8 @@ export interface StockQuoteSummary {
   sector?: string;
   insiderOwnership?: number;
   priceToBook?: number;
+  priceToSales?: number;
+  priceToEarnings?: number;
   currentRatio?: number;
   quickRatio?: number;
   debtToEquity?: number;

@@ -1,5 +1,6 @@
 "use client";
 import { SecondaryButton } from "@/components/SecondaryButton";
+import { H3 } from "@/components/Typography";
 import { StoreState } from "@/config/ReduxStore";
 import { updateConfigState } from "@/config/_Actions";
 import { routes } from "@/config/_routes";
@@ -10,7 +11,6 @@ import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux";
 import { MainMenu } from "./MainMenu";
 import { SwipeMenu } from "./SwipeMenu";
-import { H3 } from "@/components/Typography";
 
 interface Props {
   children: JSX.Element | null;
@@ -107,6 +107,17 @@ export default function Layout(props: Props) {
             </div>
             <div className="pb-24">
               <MainMenu />
+            </div>
+            <div className="absolute bottom-0 w-full px-4 text-sm font-semibold pb-4">
+              Made with ❤️ by{" "}
+              <a
+                href="https://zeltta.co.nz"
+                target="_blank"
+                rel="noreferrer"
+                className="text-blue-500"
+              >
+                Zeltta
+              </a>
             </div>
           </div>
         </div>
