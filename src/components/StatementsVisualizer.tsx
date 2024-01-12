@@ -14,6 +14,7 @@ import {
 } from "recharts";
 import { theme } from "../../tailwind.config";
 import { H2 } from "./Typography";
+import dayjs from "dayjs";
 
 interface ChartData {
   [key: string]: number | string;
@@ -109,7 +110,7 @@ export const StatementsVisualizer = (props: {
   return (
     <div>
       <H2 className="my-4">{props.label}</H2>
-      <ResponsiveContainer width="100%" height={1000}>
+      <ResponsiveContainer width="100%" height={600}>
         <BarChart stackOffset="sign" data={chartData}>
           <Tooltip
             labelStyle={{ fontWeight: "bold" }}
@@ -262,13 +263,18 @@ export const StatementsVisualizer = (props: {
             tick={{
               fill: isDark ? theme.colors.gray[300] : theme.colors.gray[700],
             }}
+            tickFormatter={(label) => {
+              if (label) {
+                const date = dayjs(label);
+                return date.format("DD MMM YYYY");
+              }
+              return "";
+            }}
           />
           <YAxis
             tickFormatter={(num) => `$${Intl.NumberFormat("en").format(num)}`}
             width={100}
             fontSize={12}
-            // color
-            // tick
             tick={{
               fill: isDark ? theme.colors.gray[300] : theme.colors.gray[700],
             }}
