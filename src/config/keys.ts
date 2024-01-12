@@ -11,5 +11,5 @@ export const isDev =
 if (isDev) {
   clientURL = "http://localhost:3000";
 } else {
-  clientURL = "https://stonkvisualizer.com";
+  clientURL = "https://www.stonkvisualizer.com";
 }
