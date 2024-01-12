@@ -109,6 +109,19 @@ export default function Layout(props: Props) {
               <MainMenu />
             </div>
             <div className="absolute bottom-0 w-full px-4 text-sm font-semibold pb-4">
+              <div>
+                All data by{" "}
+                <a
+                  href="https://finance.yahoo.com/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-blue-500"
+                >
+                  Yahoo Finance
+                </a>
+              </div>
+              <div>
+
               Made with ❤️ by{" "}
               <a
                 href="https://zeltta.co.nz"
@@ -118,6 +131,7 @@ export default function Layout(props: Props) {
               >
                 Zeltta
               </a>
+              </div>
             </div>
           </div>
         </div>
