@@ -9,25 +9,26 @@ export async function GET(
   try {
     const symbol = params.symbol;
 
-    const fundamentals = await yahooFinance.quoteSummary(symbol, {
-      
-      modules: [
-        "assetProfile",
-        "balanceSheetHistory",
-        "balanceSheetHistoryQuarterly",
-        "incomeStatementHistory",
-        "incomeStatementHistoryQuarterly",
-        "cashflowStatementHistory",
-        "cashflowStatementHistoryQuarterly",
-        "defaultKeyStatistics",
-        "price",
-        "majorHoldersBreakdown",
-        "financialData",
-        "earnings",
-      ],
-    });
-
-    console.log(fundamentals.balanceSheetHistory?.balanceSheetStatements);
+    const fundamentals = await yahooFinance.quoteSummary(
+      symbol,
+      {
+        modules: [
+          "assetProfile",
+          "balanceSheetHistory",
+          "balanceSheetHistoryQuarterly",
+          "incomeStatementHistory",
+          "incomeStatementHistoryQuarterly",
+          "cashflowStatementHistory",
+          "cashflowStatementHistoryQuarterly",
+          "defaultKeyStatistics",
+          "price",
+          "financialData",
+        ],
+      },
+      {
+        validateResult: false,
+      }
+    );
 
     const response: StockQuoteSummary = {
       name: fundamentals.price?.longName || "",
@@ -36,8 +37,12 @@ export async function GET(
       sector: fundamentals.assetProfile?.sector,
       insiderOwnership: fundamentals.defaultKeyStatistics?.heldPercentInsiders,
       priceToBook: fundamentals.defaultKeyStatistics?.priceToBook,
-      priceToSales: (fundamentals.price?.marketCap||0) / (fundamentals.financialData?.totalRevenue ||0),
-      priceToEarnings: (fundamentals.price?.regularMarketPrice||0) / (fundamentals.defaultKeyStatistics?.trailingEps ||0),
+      priceToSales:
+        (fundamentals.price?.marketCap || 0) /
+        (fundamentals.financialData?.totalRevenue || 0),
+      priceToEarnings:
+        (fundamentals.price?.regularMarketPrice || 0) /
+        (fundamentals.defaultKeyStatistics?.trailingEps || 0),
       currentRatio: fundamentals.financialData?.currentRatio,
       quickRatio: fundamentals.financialData?.quickRatio,
       debtToEquity: fundamentals.financialData?.debtToEquity,
@@ -84,23 +89,23 @@ export async function GET(
       },
     };
 
-    if (!fundamentals.incomeStatementHistory?.incomeStatementHistory) {
-      throw new Error("No income statement history");
-    }
-    if (!fundamentals.balanceSheetHistory?.balanceSheetStatements) {
-      throw new Error("No balance sheet history");
-    }
-    if (!fundamentals.cashflowStatementHistory?.cashflowStatements) {
-      throw new Error("No cashflow statement history");
-    }
+    // if (!fundamentals.incomeStatementHistory?.incomeStatementHistory) {
+    //   throw new Error("No income statement history");
+    // }
+    // if (!fundamentals.balanceSheetHistory?.balanceSheetStatements) {
+    //   throw new Error("No balance sheet history");
+    // }
+    // if (!fundamentals.cashflowStatementHistory?.cashflowStatements) {
+    //   throw new Error("No cashflow statement history");
+    // }
     const incomeHist =
-      fundamentals.incomeStatementHistory?.incomeStatementHistory;
+      fundamentals.incomeStatementHistory?.incomeStatementHistory || [];
     const balanceHist =
-      fundamentals.balanceSheetHistory?.balanceSheetStatements;
+      fundamentals.balanceSheetHistory?.balanceSheetStatements || [];
     const cashflowHist =
-      fundamentals.cashflowStatementHistory?.cashflowStatements;
+      fundamentals.cashflowStatementHistory?.cashflowStatements || [];
 
-    //
+    console.log(JSON.stringify(incomeHist, null, 2));
 
     for (let I = 0; I < incomeHist.length; I++) {
       const y = incomeHist[I];
@@ -154,21 +159,22 @@ export async function GET(
 
     //
 
-    if (!fundamentals.incomeStatementHistoryQuarterly?.incomeStatementHistory) {
-      throw new Error("No income statement history");
-    }
-    if (!fundamentals.balanceSheetHistoryQuarterly?.balanceSheetStatements) {
-      throw new Error("No balance sheet history");
-    }
-    if (!fundamentals.cashflowStatementHistoryQuarterly?.cashflowStatements) {
-      throw new Error("No cashflow statement history");
-    }
+    // if (!fundamentals.incomeStatementHistoryQuarterly?.incomeStatementHistory) {
+    //   throw new Error("No income statement history");
+    // }
+    // if (!fundamentals.balanceSheetHistoryQuarterly?.balanceSheetStatements) {
+    //   throw new Error("No balance sheet history");
+    // }
+    // if (!fundamentals.cashflowStatementHistoryQuarterly?.cashflowStatements) {
+    //   throw new Error("No cashflow statement history");
+    // }
     const incomeHistQ =
-      fundamentals.incomeStatementHistoryQuarterly?.incomeStatementHistory;
+      fundamentals.incomeStatementHistoryQuarterly?.incomeStatementHistory ||
+      [];
     const balanceHistQ =
-      fundamentals.balanceSheetHistoryQuarterly?.balanceSheetStatements;
+      fundamentals.balanceSheetHistoryQuarterly?.balanceSheetStatements || [];
     const cashflowHistQ =
-      fundamentals.cashflowStatementHistoryQuarterly?.cashflowStatements;
+      fundamentals.cashflowStatementHistoryQuarterly?.cashflowStatements || [];
 
     for (let I = 0; I < incomeHistQ.length; I++) {
       const y = incomeHistQ[I];
@@ -225,6 +231,7 @@ export async function GET(
       data: response,
     });
   } catch (e) {
+
     return Response.json({
       headers: { "content-type": "application/json" },
       data: e,
