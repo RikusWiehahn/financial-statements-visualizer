@@ -1,4 +1,8 @@
-import { StockQuoteSummary } from "@/config/_Interfaces";
+import {
+  AnnualTimeSeriesRecord,
+  QtrTimeSeriesData,
+  StockQuoteSummary,
+} from "@/config/_Interfaces";
 import dayjs from "dayjs";
 import yahooFinance from "yahoo-finance2";
 
@@ -89,149 +93,128 @@ export async function GET(
       },
     };
 
-    // if (!fundamentals.incomeStatementHistory?.incomeStatementHistory) {
-    //   throw new Error("No income statement history");
-    // }
-    // if (!fundamentals.balanceSheetHistory?.balanceSheetStatements) {
-    //   throw new Error("No balance sheet history");
-    // }
-    // if (!fundamentals.cashflowStatementHistory?.cashflowStatements) {
-    //   throw new Error("No cashflow statement history");
-    // }
-    const incomeHist =
-      fundamentals.incomeStatementHistory?.incomeStatementHistory || [];
-    const balanceHist =
-      fundamentals.balanceSheetHistory?.balanceSheetStatements || [];
-    const cashflowHist =
-      fundamentals.cashflowStatementHistory?.cashflowStatements || [];
-
-    console.log(JSON.stringify(incomeHist, null, 2));
-
-    for (let I = 0; I < incomeHist.length; I++) {
-      const y = incomeHist[I];
-      let st = response.annualStatements;
-
-      st.periods.push(dayjs(y.endDate).format("YYYY-MM-DD"));
-      st.revenue.push(y.totalRevenue);
-      st.costOfRevenue.push(y.costOfRevenue);
-      st.researchAndDevelopment.push(y.researchDevelopment || 0);
-      st.sellingGeneralAndAdmin.push(y.sellingGeneralAdministrative || 0);
-      st.netIncome.push(y.netIncome || 0);
-    }
-
-    for (let I = 0; I < balanceHist.length; I++) {
-      const y = balanceHist[I];
-      let st = response.annualStatements;
-      st.currentAssets.push(y.totalCurrentAssets || 0);
-      st.nonCurrentAssets.push(
-        (y.totalAssets || 0) - (y.totalCurrentAssets || 0)
+    const qtrTimeseriesData: QtrTimeSeriesData[] =
+      await yahooFinance.fundamentalsTimeSeries(
+        symbol,
+        {
+          period1: dayjs().subtract(2, "year").format("YYYY-MM-DD"),
+          period2: dayjs().format("YYYY-MM-DD"), // end date
+          type: "quarterly",
+        },
+        { validateResult: false }
       );
-      st.currentLiabilities.push(y.totalCurrentLiabilities || 0);
-      st.nonCurrentLiabilities.push(
-        (y.totalLiab || 0) - (y.totalCurrentLiabilities || 0)
-      );
+    // reverse the array so that the most recent data is first
+    qtrTimeseriesData.reverse();
 
-      st.cashAtEnd.push(y.cash || 0);
-    }
-
-    for (let I = 0; I < cashflowHist.length; I++) {
-      const y = cashflowHist[I];
-      let st = response.annualStatements;
-      st.netOpsCash.push(y.totalCashFromOperatingActivities || 0);
-      st.netInvestingCash.push(y.totalCashflowsFromInvestingActivities || 0);
-      st.netFinancingCash.push(y.totalCashFromFinancingActivities || 0);
-    }
-
-    for (let I = 0; I < response.annualStatements.periods.length; I++) {
-      // fetch price for each period
-      const y = response.annualStatements.periods[I];
+    for (const period of qtrTimeseriesData) {
       const res = await yahooFinance.historical(symbol, {
-        period1: y,
+        period1: dayjs(period.date).subtract(1, "day").format("YYYY-MM-DD"),
         interval: "1d",
       });
-
-      response.annualStatements.price.push(res?.[0]?.close || 0);
-
-      const sharesOutstanding =
-        fundamentals.defaultKeyStatistics?.sharesOutstanding;
-      response.annualStatements.commonStock.push(sharesOutstanding || 0);
-    }
-
-    //
-
-    // if (!fundamentals.incomeStatementHistoryQuarterly?.incomeStatementHistory) {
-    //   throw new Error("No income statement history");
-    // }
-    // if (!fundamentals.balanceSheetHistoryQuarterly?.balanceSheetStatements) {
-    //   throw new Error("No balance sheet history");
-    // }
-    // if (!fundamentals.cashflowStatementHistoryQuarterly?.cashflowStatements) {
-    //   throw new Error("No cashflow statement history");
-    // }
-    const incomeHistQ =
-      fundamentals.incomeStatementHistoryQuarterly?.incomeStatementHistory ||
-      [];
-    const balanceHistQ =
-      fundamentals.balanceSheetHistoryQuarterly?.balanceSheetStatements || [];
-    const cashflowHistQ =
-      fundamentals.cashflowStatementHistoryQuarterly?.cashflowStatements || [];
-
-    for (let I = 0; I < incomeHistQ.length; I++) {
-      const y = incomeHistQ[I];
-      let st = response.quarterlyStatements;
-
-      st.periods.push(dayjs(y.endDate).format("YYYY-MM-DD"));
-      st.revenue.push(y.totalRevenue);
-      st.costOfRevenue.push(y.costOfRevenue);
-      st.researchAndDevelopment.push(y.researchDevelopment || 0);
-      st.sellingGeneralAndAdmin.push(y.sellingGeneralAdministrative || 0);
-      st.netIncome.push(y.netIncome || 0);
-    }
-
-    for (let I = 0; I < balanceHistQ.length; I++) {
-      const y = balanceHistQ[I];
-      let st = response.quarterlyStatements;
-      st.currentAssets.push(y.totalCurrentAssets || 0);
-      st.nonCurrentAssets.push(
-        (y.totalAssets || 0) - (y.totalCurrentAssets || 0)
-      );
-      st.currentLiabilities.push(y.totalCurrentLiabilities || 0);
-      st.nonCurrentLiabilities.push(
-        (y.totalLiab || 0) - (y.totalCurrentLiabilities || 0)
-      );
-
-      st.cashAtEnd.push(y.cash || 0);
-    }
-
-    for (let I = 0; I < cashflowHistQ.length; I++) {
-      const y = cashflowHistQ[I];
-      let st = response.quarterlyStatements;
-      st.netOpsCash.push(y.totalCashFromOperatingActivities || 0);
-      st.netInvestingCash.push(y.totalCashflowsFromInvestingActivities || 0);
-      st.netFinancingCash.push(y.totalCashFromFinancingActivities || 0);
-    }
-
-    for (let I = 0; I < response.quarterlyStatements.periods.length; I++) {
-      // fetch price for each period
-      const y = response.quarterlyStatements.periods[I];
-      const res = await yahooFinance.historical(symbol, {
-        period1: y,
-        interval: "1d",
-      });
-
       response.quarterlyStatements.price.push(res?.[0]?.close || 0);
+
+      response.quarterlyStatements.periods.push(period.date);
 
       const sharesOutstanding =
         fundamentals.defaultKeyStatistics?.sharesOutstanding;
       response.quarterlyStatements.commonStock.push(sharesOutstanding || 0);
+      response.quarterlyStatements.currentAssets.push(
+        period.quarterlyCurrentAssets || 0
+      );
+      response.quarterlyStatements.nonCurrentAssets.push(
+        period.quarterlyTotalNonCurrentAssets || 0
+      );
+      response.quarterlyStatements.currentLiabilities.push(
+        period.quarterlyCurrentLiabilities || 0
+      );
+      response.quarterlyStatements.nonCurrentLiabilities.push(
+        period.quarterlyTotalNonCurrentLiabilitiesNetMinorityInterest || 0
+      );
+      response.quarterlyStatements.revenue.push(
+        period.quarterlyReceivables || 0
+      ); // Assuming revenue refers to receivables
+      response.quarterlyStatements.costOfRevenue.push(
+        period.quarterlyAccountsPayable || 0
+      ); // Assuming cost of revenue refers to accounts payable
+      response.quarterlyStatements.netIncome.push(
+        (period.quarterlyAccountsReceivable || 0) -
+          (period.quarterlyAccountsPayable || 0)
+      );
+      response.quarterlyStatements.cashAtEnd.push(
+        period.quarterlyCashAndCashEquivalents
+      );
     }
+
+    const annualTimeseriesData: AnnualTimeSeriesRecord[] =
+      await yahooFinance.fundamentalsTimeSeries(
+        symbol,
+        {
+          period1: dayjs().subtract(10, "year").format("YYYY-MM-DD"),
+          period2: dayjs().format("YYYY-MM-DD"), // end date
+          type: "annual",
+        },
+        { validateResult: false }
+      );
+    // reverse the array so that the most recent data is first
+    annualTimeseriesData.reverse();
+
+    for (const period of annualTimeseriesData) {
+      // fetch price for each period
+      const res = await yahooFinance.historical(symbol, {
+        period1: dayjs(period.date).subtract(1, "day").format("YYYY-MM-DD"),
+        interval: "1d",
+      });
+      response.annualStatements.price.push(res?.[0]?.close || 0);
+
+      response.annualStatements.periods.push(period.date);
+
+      const sharesOutstanding =
+        fundamentals.defaultKeyStatistics?.sharesOutstanding;
+      response.annualStatements.commonStock.push(sharesOutstanding || 0);
+      response.annualStatements.currentAssets.push(
+        period.trailingTotalOperatingIncomeAsReported || 0
+      );
+      response.annualStatements.nonCurrentAssets.push(
+        period.trailingNetIncomeFromContinuingOperationNetMinorityInterest || 0
+      );
+      response.annualStatements.currentLiabilities.push(
+        period.trailingReconciledDepreciation || 0
+      );
+      response.annualStatements.nonCurrentLiabilities.push(
+        period.trailingNormalizedEBITDA || 0
+      );
+      response.annualStatements.revenue.push(
+        period.trailingOperatingRevenue || 0
+      );
+      response.annualStatements.costOfRevenue.push(
+        period.trailingCostOfRevenue || 0
+      );
+      response.annualStatements.researchAndDevelopment.push(
+        period.trailingResearchAndDevelopment || 0
+      );
+      response.annualStatements.sellingGeneralAndAdmin.push(
+        period.trailingSellingGeneralAndAdministration || 0
+      );
+      response.annualStatements.netIncome.push(period.trailingNetIncome || 0);
+      response.annualStatements.netOpsCash.push(period.trailingEBITDA || 0);
+      response.annualStatements.netInvestingCash.push(
+        period.trailingOperatingIncome || 0
+      );
+      response.annualStatements.netFinancingCash.push(
+        period.trailingNetIncomeFromContinuingAndDiscontinuedOperation || 0
+      );
+      response.annualStatements.cashAtEnd.push(
+        period.trailingTotalRevenue || 0
+      );
+    }
+
+    // console.log(JSON.stringify(response, null, 2));
 
     return Response.json({
       headers: { "content-type": "application/json" },
       data: response,
     });
   } catch (e) {
-
     return Response.json({
       headers: { "content-type": "application/json" },
       data: e,
